@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Gamepad Co.</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Brand Header -->
+        <header class="brand-header">
+            <h1 class="company-name">Ghost Gamepad Co.</h1>
+        </header>
+
+        <!-- Main Game Portal -->
+        <main class="portal-box">
+            <h2>Select a Simulation</h2>
+            <div class="button-grid">
+                <!-- Button 1 -->
+                <button class="play-btn" onclick="launchGame('https://azgames.io')">A-Z Games</button>
+                
+                <!-- Button 2 -->
+                <button class="play-btn" onclick="launchGame('https://example.com')">Simulation 2</button>
+                
+                <!-- Button 3 -->
+                <button class="play-btn" onclick="launchGame('https://example.com')">Simulation 3</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
