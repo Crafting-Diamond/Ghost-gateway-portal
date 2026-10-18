@@ -1,61 +1,96 @@
-function launchGame(gameURL) {
-    var newTab = window.open('about:blank', '_blank');
+// script.js — inline embed (Option B) implementation
 
-    if (!newTab) {
-        alert('Please allow pop-ups for this site to launch the program!');
-        return;
+function launchGame(gameURL, gameName) {
+  const container = document.getElementById('game-frame-container');
+  const iframe = document.getElementById('game-frame');
+  const titleEl = document.getElementById('game-title');
+
+  if (!container || !iframe) {
+    // fallback to navigation
+    window.location.href = gameURL;
+    return;
+  }
+
+  // set title and src
+  titleEl.textContent = gameName || 'Game';
+  iframe.src = gameURL;
+
+  // show container
+  container.setAttribute('aria-hidden', 'false');
+
+  // detect whether embed is blocked — use load event + timeout
+  let loaded = false;
+  const onLoad = () => {
+    loaded = true;
+    iframe.removeEventListener('load', onLoad);
+    clearTimeout(fallbackTimer);
+  };
+  iframe.addEventListener('load', onLoad);
+
+  const fallbackTimer = setTimeout(() => {
+    iframe.removeEventListener('load', onLoad);
+    if (!loaded) {
+      // embedding likely blocked; close container and navigate
+      container.setAttribute('aria-hidden', 'true');
+      iframe.src = '';
+      window.location.href = gameURL;
     }
+  }, 1800);
 
-    var codeToInject = `
-      <!DOCTYPE html>
-      <html style="margin:0;padding:0;overflow:hidden;height:100%;">
-      <head>
-          <title>Application Workspace</title>
-      </head>
-      <body style="margin:0;padding:0;overflow:hidden;height:100%;background:#000;">
-        <iframe src="${gameURL}" style="border:none;width:100vw;height:100vh;margin:0;padding:0;display:block;" allow="pointer-lock; fullscreen;"></iframe>
-      </body>
-      </html>
-    `;
-
-    newTab.document.write(codeToInject);
-    newTab.document.close();
+  // store timer on container so back button can clear it if user navigates back quickly
+  container._embedFallbackTimer = fallbackTimer;
 }
 
-function applyTheme(theme) {
-    const root = document.documentElement;
-    const toggle = document.getElementById('theme-toggle');
+// Back button logic
+function closeEmbeddedGame() {
+  const container = document.getElementById('game-frame-container');
+  const iframe = document.getElementById('game-frame');
+  if (!container || !iframe) return;
 
-    root.classList.toggle('theme-light', theme === 'light');
-    localStorage.setItem('theme', theme);
+  // clear any fallback timer
+  if (container._embedFallbackTimer) {
+    clearTimeout(container._embedFallbackTimer);
+    container._embedFallbackTimer = null;
+  }
 
-    if (!toggle) return;
-
-    const icon = toggle.querySelector('.toggle-icon');
-    const label = toggle.querySelector('.toggle-label');
-
-    if (theme === 'light') {
-        icon.textContent = '☀️';
-        label.textContent = 'Day';
-        toggle.setAttribute('aria-label', 'Switch to night mode');
-    } else {
-        icon.textContent = '🌙';
-        label.textContent = 'Night';
-        toggle.setAttribute('aria-label', 'Switch to day mode');
-    }
+  // unload iframe
+  iframe.src = '';
+  container.setAttribute('aria-hidden', 'true');
 }
 
-function toggleTheme() {
-    const saved = localStorage.getItem('theme');
-    const nextTheme = saved === 'light' ? 'dark' : 'light';
-    applyTheme(nextTheme);
-}
+// Attach listeners once DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  const back = document.getElementById('game-back');
+  const container = document.getElementById('game-frame-container');
+  const iframe = document.getElementById('game-frame');
 
-function initTheme() {
-    const saved = localStorage.getItem('theme');
-    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-    const theme = saved || (prefersLight ? 'light' : 'dark');
-    applyTheme(theme);
-}
+  if (back && container && iframe) {
+    back.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeEmbeddedGame();
+    });
+  }
 
-window.addEventListener('DOMContentLoaded', initTheme);
+  // Attach listeners to play buttons (data-url + data-name)
+  document.querySelectorAll('.play-btn').forEach(btn => {
+    const url = btn.getAttribute('data-url');
+    const name = btn.getAttribute('data-name') || btn.textContent.trim();
+    if (!url) return;
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      launchGame(url, name);
+    });
+
+    // keyboard support
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        launchGame(url, name);
+      }
+    });
+
+    // make sure button is focusable
+    if (!btn.hasAttribute('tabindex')) btn.setAttribute('tabindex', '0');
+  });
+});
