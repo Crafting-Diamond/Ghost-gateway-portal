@@ -7,11 +7,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div class="container">
+    <div class="container" id="portal">
         <header class="brand-header">
             <div class="brand-wrap">
-                <span class="brand-mark">G</span>
+                <span class="brand-mark" aria-hidden="true">G</span>
                 <h1 class="company-name">Ghost Gateway Co.</h1>
             </div>
 
@@ -24,11 +23,19 @@
         <main class="portal-box">
             <h2>Select a Simulation</h2>
             <div class="button-grid">
-                <button class="play-btn" onclick="launchGame('https://azgames.io')">A-Z</button>
-                <button class="play-btn" onclick="launchGame('https://kahoot.si')">Kiwi</button>
-                <button class="play-btn" onclick="launchGame('https://gulper.io')">Gulper.io</button>
+                <button class="play-btn" data-url="https://azgames.io" data-name="A-Z">A-Z</button>
+                <button class="play-btn" data-url="https://kahoot.si" data-name="Kiwi">Kiwi</button>
+                <button class="play-btn" data-url="https://gulper.io" data-name="Gulper.io">Gulper.io</button>
             </div>
         </main>
+    </div>
+
+    <div id="game-frame-container" class="game-frame-container" aria-hidden="true">
+      <div class="game-frame-toolbar">
+        <button id="game-back" class="game-back" aria-label="Back to portal">← Back</button>
+        <span id="game-title" class="game-title">Game</span>
+      </div>
+      <iframe id="game-frame" class="game-frame" src="" frameborder="0" allow="fullscreen; pointer-lock"></iframe>
     </div>
 
     <script src="theme-toggle.js"></script>
