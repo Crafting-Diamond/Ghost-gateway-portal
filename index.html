@@ -7,26 +7,42 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="bg-orb orb-1" aria-hidden="true"></div>
+    <div class="bg-orb orb-2" aria-hidden="true"></div>
 
     <div class="container">
-        <!-- Brand Header -->
         <header class="brand-header">
-            <h1 class="company-name">Ghost Gateway Co.</h1>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle day/night">🌙 Night</button>
+            <div class="brand-wrap">
+                <span class="brand-mark" aria-hidden="true">G</span>
+                <h1 class="company-name">Ghost Gateway Co.</h1>
+            </div>
+            <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle day/night">
+                <span class="toggle-icon">🌙</span>
+                <span class="toggle-label">Night</span>
+            </button>
         </header>
 
-        <!-- Main Game Portal -->
         <main class="portal-box">
+            <div class="panel-topline">
+                <span class="status-dot" aria-hidden="true"></span>
+                <span>Portal Active</span>
+            </div>
             <h2>Select a Simulation</h2>
             <div class="button-grid">
-                <!-- Button 1 -->
-                <button class="play-btn" onclick="launchGame('https://azgames.io')">A-Z</button>
-                
-                <!-- Button 2 -->
-                <button class="play-btn" onclick="launchGame('https://kahoot.si')">Kiwi</button>
-                
-                <!-- Button 3 -->
-                <button class="play-btn" onclick="launchGame('https://gulper.io')">Gulper.io</button>
+                <button class="play-btn" data-url="https://azgames.io">
+                    <span>A-Z</span>
+                    <small>Arcade</small>
+                </button>
+
+                <button class="play-btn" data-url="https://kahoot.si">
+                    <span>Kiwi</span>
+                    <small>Quick Play</small>
+                </button>
+
+                <button class="play-btn" data-url="https://gulper.io">
+                    <span>Gulper.io</span>
+                    <small>Challenge</small>
+                </button>
             </div>
         </main>
     </div>
