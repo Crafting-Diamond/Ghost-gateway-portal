@@ -1,12 +1,16 @@
-// script.js — navigation-to-game-page implementation
+// script.js — open games in a new tab (reliable fallback for sites that block embedding)
 
-function openGamePage(gameURL, gameName) {
-  // Navigate to the dedicated game page with encoded params
-  const params = new URLSearchParams();
-  params.set('url', gameURL);
-  if (gameName) params.set('name', gameName);
-  // Use relative path so it works when deployed
-  window.location.href = `game.html?${params.toString()}`;
+function openGameInNewTab(gameURL, gameName) {
+  if (!gameURL) return;
+
+  // Open in a new tab/window. Use noopener to avoid giving the opened page access to our window.
+  const newWin = window.open(gameURL, '_blank', 'noopener');
+
+  // If the browser blocked the popup, fall back to navigation so the click still works.
+  if (!newWin) {
+    // This will replace the current page (safer fallback) — usually allowed because the click started the flow.
+    window.location.href = gameURL;
+  }
 }
 
 // Attach listeners once DOM is ready
@@ -19,14 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      openGamePage(url, name);
+      openGameInNewTab(url, name);
     });
 
     // keyboard support
     btn.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        openGamePage(url, name);
+        openGameInNewTab(url, name);
       }
     });
 
