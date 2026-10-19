@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title id="page-title">Game</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Page-specific styles to make the game area larger */
+    .game-page {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+    }
+    .game-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.5rem 1rem;
+      background: var(--surface, #111);
+      color: var(--on-surface, #fff);
+    }
+    .game-iframe {
+      flex: 1 1 auto;
+      width: 100%;
+      border: 0;
+    }
+    .embed-blocked {
+      padding: 1rem;
+      text-align: center;
+    }
+    .game-title {
+      font-weight: 600;
+    }
+    .game-back {
+      background: transparent;
+      color: inherit;
+      border: 0;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="game-page">
+  <div class="game-toolbar">
+    <button id="back-btn" class="game-back" aria-label="Back to portal">← Back</button>
+    <div class="game-title" id="game-title">Game</div>
+    <div style="flex:1"></div>
+    <a id="open-new-tab" class="open-new-tab" href="#" target="_blank" rel="noopener">Open in new tab</a>
+  </div>
+
+  <iframe id="game-iframe" class="game-iframe" src="" allow="fullscreen; pointer-lock"></iframe>
+
+  <div id="embed-blocked" class="embed-blocked" hidden>
+    <p>Embedding is blocked by the remote site. <a id="open-link" href="#" target="_blank" rel="noopener">Open the game in a new tab</a>.</p>
+  </div>
+
+  <script>
+    function q(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    const gameURL = q('url');
+    const gameName = q('name') || 'Game';
+
+    const titleEl = document.getElementById('game-title');
+    const iframe = document.getElementById('game-iframe');
+    const back = document.getElementById('back-btn');
+    const openNew = document.getElementById('open-new-tab');
+    const openLink = document.getElementById('open-link');
+    const blockedMsg = document.getElementById('embed-blocked');
+
+    titleEl.textContent = gameName;
+    document.title = gameName + ' — Ghost Gateway';
+
+    // Back to portal
+    back.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    if (!gameURL) {
+      // nothing to do
+      blockedMsg.hidden = false;
+      blockedMsg.innerHTML = '<p>No game URL provided. <a href="index.html">Return to portal</a>.</p>';
+    } else {
+      openNew.href = gameURL;
+      openLink.href = gameURL;
+
+      // Try embedding; detect whether load happens within a timeframe
+      let loaded = false;
+      const onLoad = () => {
+        loaded = true;
+        iframe.removeEventListener('load', onLoad);
+        blockedMsg.hidden = true;
+      };
+      iframe.addEventListener('load', onLoad);
+      iframe.src = gameURL;
+
+      const fallbackTimer = setTimeout(() => {
+        iframe.removeEventListener('load', onLoad);
+        if (!loaded) {
+          // embedding likely blocked
+          iframe.style.display = 'none';
+          blockedMsg.hidden = false;
+          openNew.style.display = 'inline-block';
+        }
+      }, 1800);
+
+      // Clear timer if user leaves
+      window.addEventListener('beforeunload', () => clearTimeout(fallbackTimer));
+    }
+  </script>
+</body>
+</html>
