@@ -70,7 +70,7 @@ body {
     justify-content: center;
     align-items: center;
     background: var(--accent);
-    color: #111;
+    color: #FFFFFF;
     font-weight: 800;
     box-shadow: 0 8px 18px var(--button-shadow);
 }
